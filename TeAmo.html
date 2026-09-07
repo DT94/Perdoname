@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Perdón, mi amor ❤️‍🩹</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <!-- jsPDF para generar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(145deg, #2c2c3a 0%, #1e1e2a 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #f0e6e6;
+        }
+        .font-title { font-weight: 700; letter-spacing: 0.5px; }
+        .card {
+            background: rgba(255,255,255,0.07);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
+            transition: all 0.3s ease;
+        }
+        .card:hover { background: rgba(255,255,255,0.12); }
+        .btn-option {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .btn-option:active { transform: scale(0.96); }
+        .evasive { transition: all 0.05s ease; position: relative; }
+        .heart-broken {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.12;
+            font-size: 2.4rem;
+            animation: floatDown linear infinite;
+            user-select: none;
+        }
+        @keyframes floatDown {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0.08; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+        .slide-in {
+            animation: slideIn 0.6s cubic-bezier(0.23,1,0.32,1) forwards;
+        }
+        @keyframes slideIn {
+            0% { opacity: 0; transform: translateY(40px) scale(0.97); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .pulse-soft {
+            animation: pulseSoft 2.5s infinite;
+        }
+        @keyframes pulseSoft {
+            0% { box-shadow: 0 0 0 0 rgba(255,100,100,0.3); }
+            70% { box-shadow: 0 0 0 15px rgba(255,100,100,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,100,100,0); }
+        }
+        .confetti-piece {
+            position: fixed; pointer-events: none; z-index: 9999;
+            width: 8px; height: 8px; border-radius: 2px;
+            animation: confettiFall 3s ease-in forwards;
+        }
+        @keyframes confettiFall {
+            0% { opacity: 1; transform: translateY(-20px) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(110vh) rotate(720deg); }
+        }
+        .rain-drop {
+            position: fixed; pointer-events: none; z-index: 0;
+            width: 2px; background: rgba(255,255,255,0.15);
+            animation: rain linear infinite;
+        }
+        @keyframes rain {
+            0% { transform: translateY(-10vh); opacity: 0.3; }
+            100% { transform: translateY(110vh); opacity: 0; }
+        }
+        .sub-option {
+            border-left: 3px solid #f472b6;
+            padding-left: 1rem;
+            transition: all 0.2s;
+        }
+        .sub-option:hover {
+            border-left-color: #f9a8d4;
+            background: rgba(255,255,255,0.05);
+        }
+        .back-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all 0.2s;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.1); }
+        .emotion-badge {
+            font-size: 3rem;
+            display: inline-block;
+            animation: bounceEmotion 1.5s infinite;
+        }
+        @keyframes bounceEmotion {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Decoraciones: corazones rotos + lluvia -->
+    <div id="decorations"></div>
+
+    <main id="app" class="relative z-10 flex items-center justify-center min-h-screen p-4">
+        <!-- Pantalla 1: Pregunta principal -->
+        <div id="screen1" class="w-full max-w-2xl mx-auto slide-in">
+            <div class="card p-8 md:p-12 text-center">
+                <div class="text-6xl mb-4">💔</div>
+                <h1 class="font-title text-3xl md:text-5xl text-pink-300 mb-3">
+                    ¿Puedes perdonarme?
+                </h1>
+                <p class="text-gray-300 text-base md:text-lg mb-8 max-w-md mx-auto">
+                    Sé que te fallé, que las mentiras rompieron lo que construimos.
+                    Pero quiero darte todas las opciones para decidir <span class="text-pink-300">cómo sanamos</span>.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button onclick="goToSub(1)" class="btn-option bg-rose-800/70 hover:bg-rose-700/90 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-3">
+                        <i class="fas fa-heart text-pink-300"></i> Lo intentamos de nuevo
+                    </button>
+                    <button onclick="goToSub(2)" class="btn-option bg-amber-800/70 hover:bg-amber-700/90 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-3">
+                        <i class="fas fa-clock text-amber-300"></i> Necesito tiempo
+                    </button>
+                    <button onclick="goToSub(3)" class="btn-option bg-blue-800/70 hover:bg-blue-700/90 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-3">
+                        <i class="fas fa-comments text-blue-300"></i> Hablemos con calma
+                    </button>
+                    <button onclick="goToSub(4)" class="btn-option bg-indigo-800/70 hover:bg-indigo-700/90 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-3">
+                        <i class="fas fa-hand-holding-heart text-indigo-300"></i> Te perdono, pero con cambios
+                    </button>
+                    <!-- Botón evasivo -->
+                    <button id="evasiveBtn" class="btn-option bg-gray-700/70 hover:bg-gray-600/90 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-3 evasive col-span-1 sm:col-span-2">
+                        <i class="fas fa-times-circle text-gray-400"></i> No te perdono
+                    </button>
+                </div>
+                <p class="text-xs text-gray-500 mt-6">
+                    <i class="fas fa-arrow-left mr-1"></i> Todas las opciones son válidas, te escucho
+                </p>
+            </div>
+        </div>
+
+        <!-- Pantalla de subopciones -->
+        <div id="subScreen" class="w-full max-w-2xl mx-auto hidden slide-in">
+            <div class="card p-8 md:p-12">
+                <div class="flex items-center gap-3 mb-4">
+                    <button onclick="goBack()" class="back-btn text-gray-300 hover:text-white px-4 py-2 rounded-full text-sm flex items-center gap-2">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </button>
+                    <span class="text-gray-400 text-sm">Paso 2</span>
+                </div>
+                <div id="subContent" class="text-center">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla final -->
+        <div id="screenFinal" class="w-full max-w-2xl mx-auto hidden slide-in">
+            <div class="card p-8 md:p-12 text-center">
+                <div id="emotionDisplay" class="text-6xl mb-4 emotion-badge">❤️</div>
+                <h2 class="font-title text-3xl md:text-4xl text-pink-300 mb-2">Gracias por escucharme</h2>
+                <p class="text-gray-300 text-sm md:text-base mb-4 max-w-md mx-auto">
+                    Sea lo que hayas elegido, prometo respetarlo y trabajar en mí para ser mejor.
+                </p>
+                <div id="finalMessage" class="mt-4 p-6 bg-white/10 rounded-2xl text-pink-200 font-semibold text-left">
+                    <!-- Mensaje personalizado -->
+                </div>
+                <!-- Botón descargar PDF -->
+                <button onclick="downloadPDF()" class="mt-6 bg-green-700/80 hover:bg-green-600/80 text-white font-bold py-3 px-8 rounded-full shadow-lg transition flex items-center justify-center gap-2 mx-auto">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF con mi compromiso
+                </button>
+                <button onclick="location.reload()" class="mt-4 bg-pink-700/80 hover:bg-pink-600/80 text-white font-bold py-2 px-6 rounded-full shadow-lg transition text-sm">
+                    <i class="fas fa-redo-alt mr-2"></i> Volver a empezar
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        (function() {
+            "use strict";
+
+            // === DECORACIONES ===
+            const deco = document.getElementById('decorations');
+            const broken = ['💔','🥀','😢','💧','🕊️'];
+            for (let i=0; i<22; i++) {
+                const el = document.createElement('div');
+                el.className = 'heart-broken';
+                el.textContent = broken[Math.floor(Math.random()*broken.length)];
+                el.style.left = Math.random()*100+'%';
+                el.style.animationDuration = (18+Math.random()*25)+'s';
+                el.style.fontSize = (1.8+Math.random()*3)+'rem';
+                el.style.opacity = 0.05+Math.random()*0.12;
+                el.style.animationDelay = (Math.random()*20)+'s';
+                deco.appendChild(el);
+            }
+            for (let i=0; i<60; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'rain-drop';
+                drop.style.left = Math.random()*100+'%';
+                drop.style.height = (12+Math.random()*30)+'px';
+                drop.style.animationDuration = (0.8+Math.random()*1.5)+'s';
+                drop.style.animationDelay = (Math.random()*3)+'s';
+                deco.appendChild(drop);
+            }
+
+            // === BOTÓN EVASIVO ===
+            const evasive = document.getElementById('evasiveBtn');
+            let active = true;
+            function move(e) {
+                if (!active) return;
+                e.preventDefault();
+                const cont = evasive.parentElement;
+                const rect = cont.getBoundingClientRect();
+                const btn = evasive.getBoundingClientRect();
+                const maxX = rect.width - btn.width - 10;
+                const maxY = rect.height - btn.height - 10;
+                evasive.style.position = 'absolute';
+                evasive.style.left = Math.min(Math.random()*maxX, maxX)+'px';
+                evasive.style.top = Math.min(Math.random()*maxY, maxY)+'px';
+                evasive.style.zIndex = '50';
+            }
+            evasive.addEventListener('mouseover', move);
+            evasive.addEventListener('touchstart', function(e){ move(e); e.preventDefault(); }, {passive:false});
+            evasive.addEventListener('touchmove', function(e){ e.preventDefault(); }, {passive:false});
+            window.addEventListener('resize', function() {
+                if (evasive.style.position === 'absolute') {
+                    const cont = evasive.parentElement;
+                    const rect = cont.getBoundingClientRect();
+                    const btn = evasive.getBoundingClientRect();
+                    let left = parseFloat(evasive.style.left)||0;
+                    let top = parseFloat(evasive.style.top)||0;
+                    const maxX = rect.width - btn.width - 10;
+                    const maxY = rect.height - btn.height - 10;
+                    if (left > maxX) left = Math.max(0, maxX);
+                    if (top > maxY) top = Math.max(0, maxY);
+                    evasive.style.left = left+'px';
+                    evasive.style.top = top+'px';
+                }
+            });
+
+            // === OPCIONES Y SUBOPCIONES ===
+            const subOptions = {
+                1: {
+                    title: "💞 Lo intentamos de nuevo",
+                    desc: "Elegiste reconstruir. ¿Qué voy a hacer para merecer tu confianza?",
+                    emotion: "😊",
+                    emotionLabel: "Feliz y esperanzado",
+                    items: [
+                        { label: "Terapia de pareja", icon: "fa-hand-holding-heart", desc: "Buscar ayuda profesional para aprender a comunicarnos." },
+                        { label: "Sinceridad total", icon: "fa-shield-alt", desc: "No más mentiras, aunque duela. Te contaré todo." },
+                        { label: "Tiempo de calidad", icon: "fa-clock", desc: "Dedicarte tiempo sin distracciones, solo nosotros." },
+                        { label: "Cambios en mi rutina", icon: "fa-calendar-check", desc: "Ajustar mis hábitos para que te sientas segura." }
+                    ],
+                    finalMsg: "Me comprometo a trabajar en cada uno de estos puntos. ¿Podemos intentarlo?"
+                },
+                2: {
+                    title: "⏳ Necesito tiempo",
+                    desc: "Entiendo. Te daré espacio. ¿Qué esperas de mí mientras tanto?",
+                    emotion: "😔",
+                    emotionLabel: "Triste pero comprensivo",
+                    items: [
+                        { label: "Respetar tu silencio", icon: "fa-hand-peace", desc: "No te presionaré ni buscaré respuestas a la fuerza." },
+                        { label: "Escribirte cartas", icon: "fa-envelope", desc: "Te escribiré lo que siento sin esperar respuesta." },
+                        { label: "No llamar ni aparecer", icon: "fa-phone-slash", desc: "Cero mensajes ni llamadas hasta que tú quieras." },
+                        { label: "Trabajar en mí", icon: "fa-book-heart", desc: "Leer y reflexionar para ser mejor persona." }
+                    ],
+                    finalMsg: "Tomaré el tiempo que necesites. Quiero que sanes, aunque no sea a mi lado."
+                },
+                3: {
+                    title: "💬 Hablemos con calma",
+                    desc: "Quiero que la conversación sea segura para ti. ¿Qué necesitas de mí?",
+                    emotion: "🧘",
+                    emotionLabel: "Sereno y dispuesto",
+                    items: [
+                        { label: "Escucha activa", icon: "fa-ear-listen", desc: "Sin interrumpir, sin juzgar, solo escuchar." },
+                        { label: "Sin gritos ni reclamos", icon: "fa-hand-holding-heart", desc: "Hablar desde el respeto, sin levantar la voz." },
+                        { label: "Tiempo sin prisa", icon: "fa-hourglass-half", desc: "Conversar sin reloj, hasta que te sientas cómoda." },
+                        { label: "Un lugar neutral", icon: "fa-tree", desc: "Salir a caminar o buscar un lugar tranquilo." }
+                    ],
+                    finalMsg: "Te ofrezco mi tiempo y mi calma. Cuando estés lista, hablamos."
+                },
+                4: {
+                    title: "🤝 Te perdono, pero con cambios",
+                    desc: "Valoro tu perdón. Dime qué necesitas que cambie para sentirte tranquila.",
+                    emotion: "😌",
+                    emotionLabel: "Aliviado y agradecido",
+                    items: [
+                        { label: "No mentir nunca más", icon: "fa-check-circle", desc: "Cero engaños, aunque sea por miedo." },
+                        { label: "Transparencia total", icon: "fa-eye", desc: "Compartir mi ubicación, horarios y planes." },
+                        { label: "Cortar vínculos del pasado", icon: "fa-cut", desc: "Cerrar capítulos y enfocarme en nosotros." },
+                        { label: "Demostrar con hechos", icon: "fa-hands", desc: "No solo palabras, acciones que hablen." }
+                    ],
+                    finalMsg: "Acepto tus condiciones. Haré todo lo posible para no fallarte."
+                }
+            };
+
+            // Opción especial para "No te perdono" (evasivo)
+            const noPerdonData = {
+                title: "😔 No te perdono",
+                desc: "Entiendo que el dolor es profundo. ¿Qué podría hacer para que reconsideres?",
+                emotion: "😞",
+                emotionLabel: "Resignado pero esperanzado",
+                items: [
+                    { label: "Esperar el tiempo que necesites", icon: "fa-hourglass-end", desc: "Puedo esperar años si es necesario." },
+                    { label: "Demostrar arrepentimiento diario", icon: "fa-heart", desc: "Pequeños gestos cada día." },
+                    { label: "Pedir ayuda profesional", icon: "fa-brain", desc: "Ir a terapia para entender mis errores." },
+                    { label: "Alejarme definitivamente", icon: "fa-walking", desc: "Si eso te da paz, lo haré." }
+                ],
+                finalMsg: "No importa lo que elijas, respetaré tu decisión. Siempre te querré."
+            };
+
+            // === NAVEGACIÓN ===
+            const screen1 = document.getElementById('screen1');
+            const subScreen = document.getElementById('subScreen');
+            const screenFinal = document.getElementById('screenFinal');
+            const subContent = document.getElementById('subContent');
+            const finalMsg = document.getElementById('finalMessage');
+            const emotionDisplay = document.getElementById('emotionDisplay');
+
+            let selectedOptionId = null;
+            let selectedSubLabel = '';
+            let selectedSubDesc = '';
+            let currentEmotion = '❤️';
+            let currentEmotionLabel = '';
+
+            // Mostrar subopciones
+            function showSubScreen(data) {
+                screen1.classList.add('hidden');
+                subScreen.classList.remove('hidden');
+                screenFinal.classList.add('hidden');
+
+                let html = `
+                    <h2 class="font-title text-2xl md:text-3xl text-pink-300 mb-2">${data.title}</h2>
+                    <p class="text-gray-300 text-sm md:text-base mb-6 max-w-sm mx-auto">${data.desc}</p>
+                    <div class="space-y-3 text-left">
+                `;
+                data.items.forEach((item, idx) => {
+                    html += `
+                        <div class="sub-option bg-white/5 hover:bg-white/10 rounded-xl p-4 flex items-start gap-4 cursor-pointer transition" onclick="selectSubItem(${idx})">
+                            <i class="fas ${item.icon} text-pink-400 text-xl mt-1"></i>
+                            <div>
+                                <div class="font-semibold text-white">${item.label}</div>
+                                <div class="text-sm text-gray-400">${item.desc}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                subContent.innerHTML = html;
+
+                // Guardar datos en variables globales
+                window._currentSubData = data;
+                window._currentItems = data.items;
+            }
+
+            // Seleccionar subopción
+            window.selectSubItem = function(idx) {
+                const items = window._currentItems;
+                const item = items[idx];
+                const data = window._currentSubData;
+
+                // Guardar para el PDF
+                selectedOptionId = data.id || 0;
+                selectedSubLabel = item.label;
+                selectedSubDesc = item.desc;
+                currentEmotion = data.emotion || '❤️';
+                currentEmotionLabel = data.emotionLabel || '';
+
+                // Mostrar final
+                showFinal(data);
+            };
+
+            function showFinal(data) {
+                screen1.classList.add('hidden');
+                subScreen.classList.add('hidden');
+                screenFinal.classList.remove('hidden');
+
+                // Mostrar emoción
+                emotionDisplay.textContent = currentEmotion;
+                // Mostrar mensaje personalizado
+                finalMsg.innerHTML = `
+                    <div class="mb-2 text-lg font-semibold text-pink-300">Emoción: ${currentEmotionLabel}</div>
+                    <div class="text-base">Elegiste: <span class="text-pink-300">${selectedSubLabel}</span></div>
+                    <div class="mt-2 text-sm text-gray-300">${selectedSubDesc}</div>
+                    <div class="mt-4 text-gray-200">${data.finalMsg}</div>
+                    <div class="mt-6 text-xs text-gray-400">Te quiero, y respeto tu decisión.</div>
+                `;
+
+                // Guardar datos para el PDF
+                window._pdfData = {
+                    optionTitle: data.title,
+                    optionEmotion: currentEmotion,
+                    optionEmotionLabel: currentEmotionLabel,
+                    subLabel: selectedSubLabel,
+                    subDesc: selectedSubDesc,
+                    finalMsg: data.finalMsg
+                };
+            }
+
+            // Volver atrás
+            window.goBack = function() {
+                if (!subScreen.classList.contains('hidden')) {
+                    subScreen.classList.add('hidden');
+                    screen1.classList.remove('hidden');
+                } else {
+                    location.reload();
+                }
+            };
+
+            // Ir a subopción
+            window.goToSub = function(id) {
+                let data = subOptions[id];
+                if (!data) return;
+                data.id = id;
+                showSubScreen(data);
+                // Si es el evasivo (id 5) no existe, pero lo manejamos aparte
+            };
+
+            // Caso especial: botón evasivo
+            evasive.addEventListener('click', function() {
+                // Como es evasivo, si ocurre, mostramos la opción especial
+                const data = noPerdonData;
+                data.id = 5;
+                showSubScreen(data);
+            });
+
+            // === GENERAR PDF ===
+            window.downloadPDF = function() {
+                const data = window._pdfData;
+                if (!data) {
+                    alert('Primero debes elegir una opción.');
+                    return;
+                }
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+
+                // Estilos manuales
+                const pageWidth = 210;
+                const margin = 20;
+                let y = 25;
+
+                // Título principal
+                doc.setFontSize(22);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(180, 80, 120);
+                doc.text('Carta de Perdón y Compromiso', pageWidth/2, y, { align: 'center' });
+                y += 10;
+
+                // Línea decorativa
+                doc.setDrawColor(200, 150, 180);
+                doc.line(margin, y, pageWidth-margin, y);
+                y += 8;
+
+                // Fecha
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(80, 80, 80);
+                const hoy = new Date().toLocaleDateString('es-ES', { day:'2-digit', month:'long', year:'numeric' });
+                doc.text(`Fecha: ${hoy}`, margin, y);
+                y += 8;
+
+                // Saludo
+                doc.setFontSize(14);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(50, 50, 50);
+                doc.text('Para: Camila Yuzary Carrasco Riquelme', margin, y);
+                y += 7;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(11);
+                doc.text('De: Dorly Termitus', margin, y);
+                y += 12;
+
+                // Introducción
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                const intro = [
+                    'Quiero comenzar diciéndote lo que ya sabes pero que necesito repetir: lo siento.',
+                    'Te mentí. Te oculté cosas. Te hice dudar de lo que sentías por mí y de lo que yo sentía por ti.',
+                    'No hay justificación para eso. Pero también quiero que sepas que lo que vivimos fue real.',
+                    'Cada momento contigo, cada risa, cada sueño compartido, fue verdadero.'
+                ];
+                intro.forEach(line => {
+                    doc.text(line, margin, y, { maxWidth: pageWidth - margin*2 });
+                    y += 7;
+                });
+                y += 5;
+
+                // Opción elegida
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(13);
+                doc.setTextColor(180, 80, 120);
+                doc.text('Opción elegida:', margin, y);
+                y += 7;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                doc.text(`${data.optionTitle}`, margin, y);
+                y += 7;
+                doc.text(`Emoción: ${data.optionEmotion} ${data.optionEmotionLabel}`, margin, y);
+                y += 7;
+
+                // Subopción elegida
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(13);
+                doc.setTextColor(180, 80, 120);
+                doc.text('Compromiso elegido:', margin, y);
+                y += 7;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                doc.text(`• ${data.subLabel}`, margin, y);
+                y += 6;
+                doc.setFontSize(11);
+                doc.setTextColor(60, 60, 60);
+                doc.text(`${data.subDesc}`, margin, y, { maxWidth: pageWidth - margin*2 });
+                y += 10;
+
+                // Mensaje final
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(13);
+                doc.setTextColor(180, 80, 120);
+                doc.text('Mi compromiso:', margin, y);
+                y += 7;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                const finalLines = doc.splitTextToSize(data.finalMsg, pageWidth - margin*2);
+                doc.text(finalLines, margin, y);
+                y += finalLines.length * 7 + 10;
+
+                // Despedida
+                doc.setFont('helvetica', 'italic');
+                doc.setFontSize(11);
+                doc.setTextColor(100, 100, 100);
+                doc.text('"Perdonar no es olvidar, es soltar el peso que no te deja avanzar."', pageWidth/2, y, { align: 'center' });
+                y += 10;
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(0, 0, 0);
+                doc.text(`Firma: Dorly Termitus`, margin, y);
+                y += 6;
+                doc.text(`Fecha: ${hoy}`, margin, y);
+
+                // Guardar PDF
+                doc.save('Carta_Perdon_Camila.pdf');
+            };
+
+            // === INICIO ===
+            screen1.classList.remove('hidden');
+            subScreen.classList.add('hidden');
+            screenFinal.classList.add('hidden');
+
+        })();
+    </script>
+</body>
+</html>
